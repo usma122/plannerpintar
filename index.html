@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jadwal Harian Pintar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero-header">
+      <div class="hero-content">
+        <span class="eyebrow">Planner pintar</span>
+        <h1>Jadwal Harian Pintar</h1>
+        <p>Kelola tugas harian dengan kalender visual dan AI yang membantu pilih dari mudah sampai sulit.</p>
+      </div>
+      <div class="hero-card">
+        <span>Fokus untuk hari ini</span>
+        <strong id="headerTaskSummary">0 tugas</strong>
+        <p>Gunakan kalender untuk memilih tanggal dan tambahkan tugas baru dengan mudah.</p>
+        <button id="enableNotifications" type="button" class="secondary-btn">Aktifkan Notifikasi</button>
+      </div>
+      <div class="hero-graphic" aria-hidden="true">
+        <!-- Decorative abstract SVG graphic -->
+        <svg width="380" height="220" viewBox="0 0 380 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#60a5fa" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.12" />
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="380" height="220" rx="20" fill="url(#g1)" />
+          <circle cx="48" cy="56" r="28" fill="#7c3aed" fill-opacity="0.12" />
+          <circle cx="320" cy="34" r="18" fill="#60a5fa" fill-opacity="0.14" />
+          <path d="M40 170 C 120 120, 260 220, 340 150" stroke="#bfdbfe" stroke-opacity="0.06" stroke-width="18" stroke-linecap="round" />
+          <g opacity="0.06" fill="#fff">
+            <rect x="260" y="120" width="64" height="10" rx="5" />
+            <rect x="280" y="140" width="40" height="8" rx="4" />
+          </g>
+        </svg>
+      </div>
+    </header>
+
+    <main class="grid-layout">
+      <div class="left-column">
+        <section class="panel calendar-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Kalender</h2>
+              <p>Klik tanggal untuk memilih hari dan langsung menambahkan tugas pada tanggal tersebut.</p>
+            </div>
+            <div class="calendar-controls">
+              <button id="prevMonth" type="button" aria-label="Bulan sebelumnya">←</button>
+              <select id="monthSelect" class="month-year-button"></select>
+              <select id="yearSelect" class="month-year-button"></select>
+              <button id="nextMonth" type="button" aria-label="Bulan berikutnya">→</button>
+            </div>
+          </div>
+          <div class="calendar-weekdays">
+            <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+          <div class="calendar-footer">
+            <p>Dipilih: <strong id="selectedDateLabel"></strong></p>
+            <p id="dateTaskCount"></p>
+            <div class="calendar-footer-actions">
+              <button id="addTaskByCalendar" type="button" class="calendar-add-btn">Tambah tugas di tanggal ini</button>
+              <button id="clearAll" type="button" class="calendar-clear-btn">Hapus semua tugas</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="right-column">
+        <section class="panel tasks-panel">
+          <div class="panel-header">
+            <div>
+              <h2>Daftar Tugas</h2>
+              <p id="taskSubtitle">Memuat tugas untuk tanggal yang dipilih.</p>
+            </div>
+            <div class="buttons-row">
+              <button id="sortDefault">Urutkan Default</button>
+              <button id="sortAi">Atur dengan AI</button>
+            </div>
+          </div>
+            <div id="taskList" class="task-list"></div>
+          </section>
+
+          <section class="panel ai-panel">
+          <div class="ai-panel-header">
+            <h2>Tips & Bantuan</h2>
+          </div>
+          <p>Butuh ide cepat? Contoh pertanyaan: <em>"Apa yang harus saya kerjakan dulu?"</em> atau <em>"Susun tugas hari ini"</em>.</p>
+          <div class="ai-suggestions">
+            <span>Prioritaskan tugas</span>
+            <span>Rencanakan besok</span>
+            <span>Tugas penting hari ini</span>
+          </div>
+          <div class="ai-input-row">
+            <textarea id="aiPrompt" rows="4" placeholder="Tulis pertanyaan atau perintah..."></textarea>
+            <div class="ai-actions">
+              <button id="aiFileButton" type="button" class="icon-btn" aria-label="Tambah file">
+                <!-- Camera SVG icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M12 17a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M21 21H3a2 2 0 01-2-2V7a2 2 0 012-2h3l2-2h6l2 2h3a2 2 0 012 2v12a2 2 0 01-2 2z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <input id="aiFiles" type="file" accept="image/*,.pdf,.doc,.docx,.txt" multiple class="visually-hidden" />
+              <button id="askAi" class="small-btn">Minta Bantuan</button>
+            </div>
+          </div>
+          <div id="aiFilePreview" class="ai-file-preview small" aria-hidden="true"></div>
+          <div id="aiResponse" class="ai-response"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+  <script src="script.js"></script>
+  <!-- Task creation modal -->
+  <div id="taskModal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3>Tambah Tugas</h3>
+      <div class="field">
+        <label>Nama tugas</label>
+        <input id="modalName" type="text" />
+      </div>
+      <div class="field">
+        <label>Kategori</label>
+        <input id="modalCategory" type="text" placeholder="Umum" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Durasi (menit)</label>
+          <input id="modalDuration" type="number" min="1" value="30" />
+        </div>
+        <div class="field">
+          <label>Waktu (HH:MM)</label>
+          <input id="modalTime" type="time" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Kesulitan</label>
+          <select id="modalDifficulty">
+            <option>Mudah</option>
+            <option>Sedang</option>
+            <option>Sulit</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Prioritas</label>
+          <select id="modalPriority">
+            <option>Rendah</option>
+            <option selected>Sedang</option>
+            <option>Tinggi</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="modalCancel" type="button">Batal</button>
+        <button id="modalSave" type="button">Simpan</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
